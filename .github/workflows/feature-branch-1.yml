@@ -1,14 +1,8 @@
 name: Salesforce CI/CD Pipeline
 
 on:
-  push:
-    branches:
-      - feature-branch-1
-  pull_request:
-    branches:
-      - feature-branch-1
-  workflow_dispatch:
-      # You can optionally define inputs here for manual runs
+ 
+  workflow_dispatch:    # You can optionally define inputs here for manual runs
       
 
 jobs:
