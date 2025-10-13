@@ -7,7 +7,13 @@ on:
   pull_request:
     branches:
       - feature-branch-1
-  workflow_dispatch: # Allows manual triggering
+  workflow_dispatch:
+      # You can optionally define inputs here for manual runs
+        inputs:
+           LogLevel:
+             description: 'Log level'
+             required: true
+             default: 'warning'
 
 jobs:
   build_and_test:
