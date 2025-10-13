@@ -1,0 +1,60 @@
+name: Salesforce CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - feature-branch-1
+  pull_request:
+    branches:
+      - feature-branch-1
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Salesforce CLI
+        run: npm install -g sfdx-cli
+
+      - name: Authenticate to Salesforce Org
+        run: echo ${{ secrets.SFDX_URL }} | sfdx auth:sfdxurl:store --set-default-dev-hub --alias my-dev-hub
+
+      - name: Run Apex Tests
+        run: sfdx force:apex:test:run --wait 10 --resultformat human
+
+  deploy_to_sandbox:
+    needs: build_and_test # This job depends on the success of build_and_test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Salesforce CLI
+        run: npm install -g sfdx-cli
+
+      - name: Authenticate to Sandbox
+        run: echo ${{ secrets.SANDBOX_SFDX_URL }} | sfdx auth:sfdxurl:store --set-default --alias my-sandbox
+
+      - name: Deploy to Sandbox
+        run: sfdx force:source:deploy -p force-app/main/default -c # -c for check-only deployment
+
+  deploy_to_production:
+    needs: deploy_to_sandbox
+    if: github.ref == 'refs/heads/main' # Only deploy to production from the main branch
+    runs-on: ubuntu-latest
+    environment: Production # Define environment for protection rules
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Salesforce CLI
+        run: npm install -g sfdx-cli
+
+      - name: Authenticate to Production
+        run: echo ${{ secrets.PRODUCTION_SFDX_URL }} | sfdx auth:sfdxurl:store --set-default --alias my-production
+
+      - name: Deploy to Production
+        run: sfdx force:source:deploy -p force-app/main/default
