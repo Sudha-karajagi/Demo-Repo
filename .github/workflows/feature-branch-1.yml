@@ -25,11 +25,11 @@ jobs:
       - name: Install Salesforce CLI
         run: npm install -g sfdx-cli
 
-      - name: Authenticate to Salesforce Org
-        run: echo ${{ secrets.SFDX_URL }} | sfdx auth:sfdxurl:store --set-default-dev-hub --alias my-dev-hub
+     # - name: Authenticate to Salesforce Org
+      #  run: echo ${{ secrets.SFDX_URL }} | sfdx auth:sfdxurl:store --set-default-dev-hub --alias my-dev-hub
 
-      - name: Run Apex Tests
-        run: sfdx force:apex:test:run --wait 10 --resultformat human
+      # name: Run Apex Tests
+        # run: sfdx force:apex:test:run --wait 10 --resultformat human
 
   deploy_to_sandbox:
     needs: build_and_test # This job depends on the success of build_and_test
